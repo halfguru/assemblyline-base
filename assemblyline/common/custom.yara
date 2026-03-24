@@ -983,6 +983,33 @@ rule code_ducky {
 
 }
 
+/*
+code/batch
+Polyglot HTML/batch files that use HTML comment syntax as batch label/comment
+Patterns: <!-- :, <!--:, <!-- ::, etc.
+*/
+
+rule code_batch_html_polyglot {
+
+    meta:
+        type = "code/batch"
+        score = 15
+
+    strings:
+        $polyglot_start = /^<!--\s*:?/
+
+        $batch_cmd1 = /(^|\n|@|&)(setlocal|endlocal|echo|goto|call|exit|if|for|set)[ \t]/i
+        $batch_cmd2 = /(^|\n)::.*/
+        $batch_cmd3 = /(^|\n|@|&)(netsh|net|reg|schtasks|taskkill|tasklist|vssadmin|wmic)[ \t]/i
+
+    condition:
+        $polyglot_start
+        and (
+            2 of ($batch_cmd*)
+            or #batch_cmd1 > 3
+        )
+}
+
 rule code_batch {
 
     meta:
